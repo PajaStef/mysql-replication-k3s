@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-master-ssl
+  namespace: default
+data:
+  ca.pem: |
+    #contents of ca.pem
+  server-cert.pem: |
+   #contetns of server-cert.pem
+  server-key.pem: |
+    #contents of server-key.pem
