@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-slave
+spec:
+  serviceName: mysql-slave
+  replicas: 3 #change to any amount you want
+  selector:
+    matchLabels:
+      app: mysql-slave
+  template:
+    metadata:
+      labels:
+        app: mysql-slave
+    spec:
+      initContainers:
+      - name: init-server-id
+        image: busybox
+        command:
+          - /bin/sh
+          - -c
+          - |
+            ORDINAL=$(hostname | awk -F- '{print $NF}')
+            SERVER_ID=$((ORDINAL + 2))  # Assuming the first replica starts at 2
+            REPORT_HOST=$(hostname)  # Use the pod's hostname as the report-host
+            sed "s/__SERVER_ID__/${SERVER_ID}/g" /tmp-config/my.cnf | sed "s/__REPORT_HOST__/${REPORT_HOST}/g" > /etc/mysql/conf.d/my.cnf
+        volumeMounts:
+          - name: config-template
+            mountPath: /tmp-config
+          - name: mysql-config
+            mountPath: /etc/mysql/conf.d
+      containers:
+        - name: mysql
+          image: mysql:9.2.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: root-password
+          volumeMounts:
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d/my.cnf
+              subPath: my.cnf
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            # Mount SSL certificates
+            - name: ssl-certs
+              mountPath: /etc/mysql/ssl
+              readOnly: true
+      volumes:
+        - name: config-template
+          configMap:
+            name: mysql-slave-config
+        - name: mysql-config
+          emptyDir: {}
+        # Add the volume for SSL certificates
+        - name: ssl-certs
+          secret:
+            secretName: mysql-ssl-certificates
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
