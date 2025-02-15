@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-ssl-certificates
+type: Opaque
+data:
+  ca.pem: |
+    ca.pem contents
+  server-cert.pem: |
+    server-cert.pem contents
+  server-key.pem: |
+    server-key.pem contents
+  client-cert.pem: |
+    client-cert.pem contents
+  client-key.pem: |
+    client-key.pem contens
