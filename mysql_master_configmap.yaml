@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-master-config  # Must match your StatefulSet reference
+  namespace: default # Change if needed.
+data:
+  my.cnf: |
+    [mysqld]
+    server-id=1
+    log_bin=mysql-bin
+    gtid_mode=ON
+    enforce_gtid_consistency=ON
+    bind-address=0.0.0.0
+    # SSL settings:
+    ssl-ca=/etc/mysql/ssl/ca.pem
+    ssl-cert=/etc/mysql/ssl/server-cert.pem
+    ssl-key=/etc/mysql/ssl/server-key.pem
+    #require_secure_transport=ON  #Optional
