@@ -7,10 +7,10 @@ data:
   ca.pem: |
     ca.pem contents
   server-cert.pem: |
-    server-cert.pem contents
+    server-cert.pem contents base64 encoded
   server-key.pem: |
-    server-key.pem contents
+    server-key.pem contents base64 encoded
   client-cert.pem: |
-    client-cert.pem contents
+    client-cert.pem contents base64 encoded
   client-key.pem: |
-    client-key.pem contens
+    client-key.pem contens base64 encoded
