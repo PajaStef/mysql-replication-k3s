@@ -4,7 +4,7 @@ metadata:
   name: mysql-slave
 spec:
   serviceName: mysql-slave
-  replicas: 3 #change to any amount you want
+  replicas: 3 # change to any amount you want
   selector:
     matchLabels:
       app: mysql-slave
@@ -34,10 +34,7 @@ spec:
           image: mysql:9.2.0
           env:
             - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secrets
-                  key: root-password
+              value: "rootpassword"
           volumeMounts:
             - name: mysql-config
               mountPath: /etc/mysql/conf.d/my.cnf
