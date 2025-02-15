@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-master
+  namespace: default
+spec:
+  serviceName: "mysql-master"
+  replicas: 1 # keep replicas to 1
+  selector:
+    matchLabels:
+      app: mysql-master
+  template:
+    metadata:
+      labels:
+        app: mysql-master
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:9.2.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword" # Change the root password
+            - name: MYSQL_DATABASE
+              value: "test_db"
+          volumeMounts:
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d/my.cnf
+              subPath: my.cnf
+            - name: mysql-ssl
+              mountPath: /etc/mysql/ssl
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-config
+          configMap:
+            name: mysql-master-config
+        - name: mysql-ssl
+          configMap:
+            name: mysql-master-ssl
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
